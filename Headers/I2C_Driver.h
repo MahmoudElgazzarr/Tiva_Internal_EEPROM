@@ -27,13 +27,15 @@
 //*****************************************************************************
 #define SLAVE_ADDRESS 0x22
 
-extern uint32_t pui32DataTx[NUM_I2C_DATA];
-extern uint32_t pui32DataRx[NUM_I2C_DATA];
 
 void I2C_Init();
 
-void I2C_Send();
+void I2C_Send(uint8_t Address,uint8_t *pui32DataTx,uint8_t Size);
 
-uint32_t I2C_Receive();
+void I2C_ReceiveDataFromSlave(uint32_t SlaveAddress ,uint8_t *DataReceived , uint16_t NumOfBytes);
+
+void Write_Byte(uint8_t Byte , uint8_t Slave_Address);
+
+void Ext_EepromRandomRead(uint32_t SlaveAddress, uint8_t *DataReceived, uint16_t NumOfBytes);
 
 #endif /* HEADERS_I2C_DRIVER_H_ */

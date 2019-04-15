@@ -17,9 +17,6 @@
 #include "utils/uartstdio.h"
 #include "I2C_Driver.h"
 
-
-uint32_t pui32DataTx[NUM_I2C_DATA];
-uint32_t pui32DataRx[NUM_I2C_DATA];
 uint32_t ui32Index;
 
 void I2C_Init()
@@ -72,139 +69,108 @@ void I2C_Init()
     //
     // Display the example setup on the console.
     //
-    UARTprintf("I2C Loopback Example ->");
-    UARTprintf("\n   Module = I2C0");
-    UARTprintf("\n   Mode = Single Send/Receive");
+    UARTprintf("I2C Init");
+    UARTprintf("\n   Module = I2C1");
+    UARTprintf("\n   Mode = Send");
     UARTprintf("\n   Rate = 100kbps\n\n");
-    //
-    // Initalize the data to send.
-    //
-    pui32DataTx[0] = 0;
-    pui32DataTx[1] = 0;
-    pui32DataTx[2] = 0;
 
 }
 
-void I2C_Send()
+void I2C_Send(uint8_t Address, uint8_t *pui32DataTx, uint8_t Size)
 {
     /*Set Slave Address*/
-    I2CMasterSlaveAddrSet(I2C1_BASE, SLAVE_ADDRESS, false);
+    I2CMasterSlaveAddrSet(I2C1_BASE, Address, false);
 
-    //
-    // Initalize the receive buffer.
-    //
-    for (ui32Index = 0; ui32Index < NUM_I2C_DATA; ui32Index++)
-    {
-        pui32DataRx[ui32Index] = 0;
-    }
-
-    //
     // Indicate the direction of the data.
-    //
     UARTprintf("Tranferring from: Master -----> Slave\n");
 
-    //
-    // Send 3 peices of I2C data from the master to the slave.
-    //
-    for (ui32Index = 0; ui32Index < NUM_I2C_DATA; ui32Index++)
-    {
-        //
-        // Display the data that the I2C0 master is transferring.
-        //
-        UARTprintf("  Sending: '%c'  . . .  ", pui32DataTx[ui32Index]);
+    /*Send Multiple Bytes*/
+    I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_BURST_SEND_START);
 
-        //
-        // Place the data to be sent in the data register
-        //
+    /*Send 3 peices of I2C data from the master to the slave*/
+    for (ui32Index = 0; ui32Index < Size; ui32Index++)
+    {
+        /*Display the data that the I2C1 master is transferring*/
+        UARTprintf("  Sending: '%c'  . . . \n", pui32DataTx[ui32Index]);
+
+        /* Place the data to be sent in the data register */
         I2CMasterDataPut(I2C1_BASE, pui32DataTx[ui32Index]);
 
-        //
-        // Initiate send of data from the master.  Since the loopback
-        // mode is enabled, the master and slave units are connected
-        // allowing us to receive the same data that we sent out.
-        //
-        I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_SINGLE_SEND);
+        I2CMasterControl(I2C1_BASE,I2C_MASTER_CMD_BURST_SEND_CONT);
+
+        /* Wait until master complete Reception of Ack */
+        while (I2CMasterBusy(I2C1_BASE));
     }
+    /* Send Negative Ack To Slave That Reception is complete */
+     I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_BURST_SEND_FINISH);
 }
 
-uint32_t I2C_Receive()
+void I2C_ReceiveDataFromSlave(uint32_t SlaveAddress, uint8_t *DataReceived, uint16_t NumOfBytes)
 {
-    //
-    // Reset receive buffer.
-    //
-    for (ui32Index = 0; ui32Index < NUM_I2C_DATA; ui32Index++)
+    uint16_t Index;
+    /* Set Address to the device you want to read from */
+    I2CMasterSlaveAddrSet(I2C1_BASE, SlaveAddress, true);
+
+    /* set Master to Start read from slave  */
+    I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_BURST_RECEIVE_START);
+
+    /* Wait until master complete Reception */
+    while (I2CMasterBusy(I2C1_BASE));
+
+    for (Index = 0; Index < NumOfBytes; Index++)
     {
-        pui32DataRx[ui32Index] = 0;
+        /* Store Data in Buffer */
+        DataReceived[Index] = I2CMasterDataGet(I2C1_BASE);
+
+        /* Send To Slave To Continiue Sending*/
+        I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_BURST_RECEIVE_CONT);
+
+        /* Wait until master complete Reception */
+        while (I2CMasterBusy(I2C1_BASE));
     }
+    /* Send Finish Ack */
+    I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_BURST_RECEIVE_FINISH);
+}
+void Ext_EepromRandomRead(uint32_t SlaveAddress, uint8_t *DataReceived, uint16_t NumOfBytes)
+{
+    uint16_t Index;
+        /* Set Address to the device you want to read from */
+        /*Send Dummy Byte*/
+        I2CMasterSlaveAddrSet(I2C1_BASE, SlaveAddress, false);
 
-    //
-    // Indicate the direction of the data.
-    //
-    UARTprintf("\n\nTranferring from: Slave -> Master\n");
+        /*Send Single Dummy Byte*/
+        I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_SINGLE_SEND);
+        /*Put Dummy Data & End Send*/
+        I2CMasterDataPut(I2C1_BASE,0x00);
 
-    //
-    // Modifiy the data direction to true, so that seeing the address will
-    // indicate that the I2C Master is initiating a read from the slave.
-    //
-    I2CMasterSlaveAddrSet(I2C1_BASE, SLAVE_ADDRESS, true);
+        /* Wait until master complete Reception */
+          while (I2CMasterBusy(I2C1_BASE));
 
-    //
-    // Do a dummy receive to make sure you don't get junk on the first receive.
-    //
-    I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_SINGLE_RECEIVE);
+        /* set Master to Start read from slave  */
+        I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_BURST_RECEIVE_START);
 
-    //
-    // Dummy acknowledge and wait for the receive request from the master.
-    // This is done to clear any flags that should not be set.
-    //
-    while (!(I2CSlaveStatus(I2C1_BASE) & I2C_SLAVE_ACT_TREQ))
-    {
-    }
+        /* Wait until master complete Reception */
+        while (I2CMasterBusy(I2C1_BASE));
 
-    for (ui32Index = 0; ui32Index < NUM_I2C_DATA; ui32Index++)
-    {
-        //
-        // Display the data that I2C0 slave module is transferring.
-        //
-        UARTprintf("  Sending: '%c'  . . .  ", pui32DataTx[ui32Index]);
-
-        //
-        // Place the data to be sent in the data register
-        //
-        I2CSlaveDataPut(I2C1_BASE, pui32DataTx[ui32Index]);
-
-        //
-        // Tell the master to read data.
-        //
-        I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_SINGLE_RECEIVE);
-
-        //
-        // Wait until the slave is done sending data.
-        //
-        while (!(I2CSlaveStatus(I2C1_BASE) & I2C_SLAVE_ACT_TREQ))
+        for (Index = 0; Index < NumOfBytes ; Index++)
         {
+            /* Store Data in Buffer */
+            DataReceived[Index] = I2CMasterDataGet(I2C1_BASE);
+
+            /* Send To Slave To Continiue Sending*/
+            I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_BURST_RECEIVE_CONT);
+
+            /* Wait until master complete Reception */
+            while (I2CMasterBusy(I2C1_BASE));
         }
+        /* Send Finish Ack */
+        I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_BURST_RECEIVE_FINISH);
+}
 
-        //
-        // Read the data from the master.
-        //
-        pui32DataRx[ui32Index] = I2CMasterDataGet(I2C1_BASE);
-
-        //
-        // Display the data that the slave has received.
-        //
-        UARTprintf("Received: '%c'\n", pui32DataRx[ui32Index]);
-    }
-
-    //
-    // Tell the user that the test is done.
-    //
-    UARTprintf("\nDone.\n\n");
-
-    //
-    // Return no errors
-    //
-    return (0);
+void Write_Byte(uint8_t Byte , uint8_t Slave_Address)
+{
+    /*Set Slave Address*/
+    I2CMasterSlaveAddrSet(I2C1_BASE, Slave_Address, false);
 }
 
 void InitConsole(void)
