@@ -82,6 +82,7 @@ void I2C_Init()
     pui32DataTx[0] = 0;
     pui32DataTx[1] = 0;
     pui32DataTx[2] = 0;
+
 }
 
 void I2C_Send()
@@ -123,7 +124,6 @@ void I2C_Send()
         // allowing us to receive the same data that we sent out.
         //
         I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_SINGLE_SEND);
-
     }
 }
 
