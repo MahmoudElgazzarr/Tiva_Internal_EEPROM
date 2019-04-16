@@ -15,6 +15,7 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
+#include "Eeprom_External_Driver_Cfg.h"
 #include "Eeprom_External_Driver.h"
 
 uint32_t ui32Index;

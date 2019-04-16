@@ -8,8 +8,6 @@
 #ifndef HEADERS_EEPROM_EXTERNAL_DRIVER_H_
 #define HEADERS_EEPROM_EXTERNAL_DRIVER_H_
 
-#define SLAVE_ADDRESS 0x50
-
 /*Eeprom Write*/
 void EepromWrite(uint8_t Slave_Address,uint16_t Address, uint8_t *pui32DataTx, uint8_t Size);
 

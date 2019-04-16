@@ -32,8 +32,8 @@
 #ifndef HEADERS_EEPROM_INTERNAL_DRIVER_H_
 #define HEADERS_EEPROM_INTERNAL_DRIVER_H_
 
-void Eeprom_Int_init();
-uint8_t Eeprom_Int_Write(uint16_t address,uint32_t * data, uint16_t length);
-uint32_t Eeprom_Int_Read(uint16_t address,uint32_t * data, uint16_t length);
+uint32_t Eeprom_Int_init(void);
+uint8_t Eeprom_Int_Write(uint16_t address,uint8_t * data, uint8_t length);
+void Eeprom_Int_Read(uint16_t address,uint8_t * data, uint8_t length);
 
 #endif /* HEADERS_EEPROM_INTERNAL_DRIVER_H_ */
