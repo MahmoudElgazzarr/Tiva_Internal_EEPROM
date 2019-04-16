@@ -30,12 +30,10 @@
 
 void I2C_Init();
 
-void I2C_Send(uint8_t Address,uint8_t *pui32DataTx,uint8_t Size);
+void I2C_Send(uint8_t Slave_Address,uint16_t Address, uint8_t *pui32DataTx, uint8_t Size);
 
-void I2C_ReceiveDataFromSlave(uint32_t SlaveAddress ,uint8_t *DataReceived , uint16_t NumOfBytes);
+void I2C_ReceiveDataFromSlave(uint32_t SlaveAddress, uint16_t Address , uint8_t *DataReceived, uint16_t NumOfBytes);
 
-void Write_Byte(uint8_t Byte , uint8_t Slave_Address);
-
-void Ext_EepromRandomRead(uint32_t SlaveAddress, uint8_t *DataReceived, uint16_t NumOfBytes);
+void Ext_EepromRandomRead(uint32_t SlaveAddress,uint16_t Address , uint8_t *DataReceived, uint16_t NumOfBytes);
 
 #endif /* HEADERS_I2C_DRIVER_H_ */

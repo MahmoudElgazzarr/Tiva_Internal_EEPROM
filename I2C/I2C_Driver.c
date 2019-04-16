@@ -76,16 +76,28 @@ void I2C_Init()
 
 }
 
-void I2C_Send(uint8_t Address, uint8_t *pui32DataTx, uint8_t Size)
+void I2C_Send(uint8_t Slave_Address,uint16_t Address, uint8_t *pui32DataTx, uint8_t Size)
 {
-    /*Set Slave Address*/
-    I2CMasterSlaveAddrSet(I2C1_BASE, Address, false);
+    /*Set Most Siginifcant Address*/
+    I2CMasterSlaveAddrSet(I2C1_BASE, Slave_Address , false);
 
     // Indicate the direction of the data.
     UARTprintf("Tranferring from: Master -----> Slave\n");
 
-    /*Send Multiple Bytes*/
+    /*Put Most Siginificant Address*/
+    I2CMasterDataPut(I2C1_BASE,(uint8_t)(Address>>8));
+
+    /*Start Sending*/
     I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_BURST_SEND_START);
+
+    /*Wait Until Receive Ack*/
+    while (I2CMasterBusy(I2C1_BASE));
+
+    /*Put Least Significant Address*/
+    I2CMasterDataPut(I2C1_BASE,(uint8_t)Address);
+
+    /*continue Sending*/
+    I2CMasterControl(I2C1_BASE,I2C_MASTER_CMD_BURST_SEND_CONT);
 
     /*Send 3 peices of I2C data from the master to the slave*/
     for (ui32Index = 0; ui32Index < Size; ui32Index++)
@@ -105,7 +117,7 @@ void I2C_Send(uint8_t Address, uint8_t *pui32DataTx, uint8_t Size)
      I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_BURST_SEND_FINISH);
 }
 
-void I2C_ReceiveDataFromSlave(uint32_t SlaveAddress, uint8_t *DataReceived, uint16_t NumOfBytes)
+void I2C_ReceiveDataFromSlave(uint32_t SlaveAddress, uint16_t Address , uint8_t *DataReceived, uint16_t NumOfBytes)
 {
     uint16_t Index;
     /* Set Address to the device you want to read from */
@@ -131,20 +143,32 @@ void I2C_ReceiveDataFromSlave(uint32_t SlaveAddress, uint8_t *DataReceived, uint
     /* Send Finish Ack */
     I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_BURST_RECEIVE_FINISH);
 }
-void Ext_EepromRandomRead(uint32_t SlaveAddress, uint8_t *DataReceived, uint16_t NumOfBytes)
+void Ext_EepromRandomRead(uint32_t SlaveAddress,uint16_t Address , uint8_t *DataReceived, uint16_t NumOfBytes)
 {
-    uint16_t Index;
+        uint16_t Index;
         /* Set Address to the device you want to read from */
-        /*Send Dummy Byte*/
         I2CMasterSlaveAddrSet(I2C1_BASE, SlaveAddress, false);
 
-        /*Send Single Dummy Byte*/
-        I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_SINGLE_SEND);
-        /*Put Dummy Data & End Send*/
-        I2CMasterDataPut(I2C1_BASE,0x00);
+        /*Put Most Significant Address*/
+        I2CMasterDataPut(I2C1_BASE,(uint8_t)(Address>>8));
+
+        /*Send Two Bytes*/
+        I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_BURST_SEND_START);
 
         /* Wait until master complete Reception */
-          while (I2CMasterBusy(I2C1_BASE));
+        while (I2CMasterBusy(I2C1_BASE));
+
+        /*Put Least Significant Address*/
+        I2CMasterDataPut(I2C1_BASE,(uint8_t)(Address));
+
+        /*Continue Reading*/
+        I2CMasterControl(I2C1_BASE,I2C_MASTER_CMD_BURST_SEND_CONT);
+
+        /* Wait until master complete Reception */
+        while (I2CMasterBusy(I2C1_BASE));
+
+        /* Set Address to the device you want to read from */
+        I2CMasterSlaveAddrSet(I2C1_BASE, SlaveAddress, true);
 
         /* set Master to Start read from slave  */
         I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_BURST_RECEIVE_START);
@@ -165,12 +189,7 @@ void Ext_EepromRandomRead(uint32_t SlaveAddress, uint8_t *DataReceived, uint16_t
         }
         /* Send Finish Ack */
         I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_BURST_RECEIVE_FINISH);
-}
-
-void Write_Byte(uint8_t Byte , uint8_t Slave_Address)
-{
-    /*Set Slave Address*/
-    I2CMasterSlaveAddrSet(I2C1_BASE, Slave_Address, false);
+        while (I2CMasterBusy(I2C1_BASE));
 }
 
 void InitConsole(void)

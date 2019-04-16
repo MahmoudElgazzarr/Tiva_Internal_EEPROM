@@ -12,12 +12,16 @@ int main(void)
     pui32DataRx[0] = 0;
     pui32DataRx[1] = 0;
     pui32DataRx[2] = 0;
+
     I2C_Init();
-    pui32DataTx[0] = 0x00;
+    pui32DataTx[0] = 99;
     pui32DataTx[1] = 0x01;
-    pui32DataTx[1] = 0x55;
-    Ext_EepromRandomRead(0x50,pui32DataRx,1);
-    //I2C_Send(0x50,pui32DataTx,3);
+    pui32DataTx[2] = 55;
+
+    I2C_Send(0x50,0x0001,pui32DataTx,1);
+
+    Ext_EepromRandomRead(0x50,0x00001 ,pui32DataRx,1);
+
     //I2C_ReceiveDataFromSlave(0x50,pui32DataRx,3);
     while(1)
     {
