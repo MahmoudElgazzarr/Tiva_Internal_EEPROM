@@ -4,6 +4,8 @@
 #include "Eeprom_Internal_Driver.h"
 #include <Eeprom_External_Driver.h>
 #include "Eep.h"
+#include "Ea_Cfg.h"
+#include "Ea.h"
 
 
 uint8_t pui32DataTx[4];
@@ -18,6 +20,11 @@ int main(void)
     Eeprom_Ext_init();
     /*Inatilize internal Eeprom*/
     Eeprom_Int_init();
+    /*Inalize EEP*/
+    Eep_init();
+    /*Initalize Ea*/
+    Ea_Init();
+
     /*Inialize Receive Buffer*/
     pui32DataRx[0] = 0;
     pui32DataRx[1] = 0;
