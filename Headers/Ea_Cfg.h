@@ -9,7 +9,7 @@
 #define HEADERS_EA_CFG_H_
 
 
-#define Num_of_Blocks 1
+#define Num_of_Blocks 4
 
 typedef struct Block_S
 {

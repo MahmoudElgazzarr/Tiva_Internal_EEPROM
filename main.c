@@ -40,8 +40,15 @@ int main(void)
     /*Create 3 Error Elements*/
     Error_T Error1,Error2,Error3;
 
-    /*Intalize Structure To Read*/
+    /*Intalize Structure To Read From Sensor 1*/
     Sensor_T Sensor1_R;
+
+    /*Intalize Structure To Read*/
+    Sensor_T Sensor2_R;
+
+    /*Intalize Structure To Read*/
+    Sensor_T Sensor3_R;
+
 
     /*Init Sensor1 Data*/
     Sensor1.reading = 99;
@@ -53,8 +60,13 @@ int main(void)
     Sensor2.status = 88;
     Sensor2.timestamp =77;
 
+    /*Init Sensor 3 Data*/
+    Sensor3.reading = 99;
+    Sensor3.status = 88;
+    Sensor3.timestamp =77;
+
     /*Write To Ea First Sensor Data*/
-    Ea_Write(Block_ID_1,(uint8_t *)&Sensor2);
+    Ea_Write(Block_ID_1,(uint8_t *)&Sensor1);
     /*Write To Ea Second Sensor Data*/
     Ea_Write(Block_ID_2,(uint8_t *)&Sensor2);
     /*Write To Ea Third Sensor Data*/
@@ -64,10 +76,10 @@ int main(void)
     Ea_Read(Block_ID_1, Offset_Zero,(uint8_t *)&Sensor1_R, Eight_Bytes);
 
     /*Read From Ea Sensor 2*/
-    Ea_Read(Block_ID_2, Offset_Zero,(uint8_t *)&Sensor2, Eight_Bytes);
+    Ea_Read(Block_ID_2, Offset_Zero,(uint8_t *)&Sensor2_R, Eight_Bytes);
 
     /*Read From Ea Sensor 3*/
-    Ea_Read(Block_ID_3, Offset_Zero,(uint8_t *)&Sensor3, Eight_Bytes);
+    Ea_Read(Block_ID_3, Offset_Zero,(uint8_t *)&Sensor3_R, Eight_Bytes);
 
     while (1)
     {
