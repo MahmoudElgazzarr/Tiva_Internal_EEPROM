@@ -9,7 +9,7 @@
 #define HEADERS_EA_CFG_H_
 
 
-#define Num_of_Blocks 2
+#define Num_of_Blocks 1
 
 typedef struct Block_S
 {
@@ -21,11 +21,25 @@ typedef struct Block_S
 
 enum Length_In_Bytes
 {
-    One_Byte,
+    One_Byte = 1,
     Two_Bytes,
     Three_Bytes,
     Four_Bytes,
     Five_Bytes,
+};
+enum Block_IDs
+{
+    Block_ID_1=1,
+    Block_ID_2,
+    Block_ID_3,
+    Block_ID_4,
+};
+
+enum Offset
+{
+    Offset_Zero,
+    Offset_One,
+    Offset_Two,
 };
 
 

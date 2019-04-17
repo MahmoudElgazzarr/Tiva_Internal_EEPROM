@@ -8,7 +8,7 @@
 #include "Ea_Cfg.h"
 
 
-Block_S_T Block_Arr[Num_of_Blocks] = {1,One_Byte,0x00500};
+Block_S_T Block_Arr[Num_of_Blocks] = {Block_ID_1,One_Byte,0x0050};
 
 
 

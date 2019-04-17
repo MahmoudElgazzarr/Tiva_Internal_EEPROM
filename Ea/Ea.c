@@ -33,13 +33,13 @@ void Ea_Read(uint16_t blocknumber, uint16_t blockoffset, uint8_t * data, uint16_
                break;
            }
        }
-    if(length == Block_Arr[Block_Index_In_Arr].Legth_In_Bytes)
+    if(length <= Block_Arr[Block_Index_In_Arr].Legth_In_Bytes)
     {
-        Eep_Read(Block_Arr[Block_Index_In_Arr].Start_Address ,data,Block_Arr[Block_Index_In_Arr].Legth_In_Bytes);
+        Eep_Read(*(Block_Arr[Block_Index_In_Arr].Start_Address) + blockoffset ,data,length);
     }
     else
     {
-        Eep_Read(Block_Arr[Block_Index_In_Arr].Start_Address + blockoffset,data,length);
+        /*Return Error*/
     }
 }
 /*Function That Abstracts Address Of The Block To Write To Eeprom*/
@@ -55,5 +55,5 @@ void Ea_Write(uint16_t blocknumber, uint8_t * data)
             break;
         }
     }
-    Eep_Write(Block_Arr[Block_Index_In_Arr].Start_Address ,data, Block_Arr[Block_Index_In_Arr].Legth_In_Bytes);
+    Eep_Write(*(Block_Arr[Block_Index_In_Arr].Start_Address),data, Block_Arr[Block_Index_In_Arr].Legth_In_Bytes);
 }

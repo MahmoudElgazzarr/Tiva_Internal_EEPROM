@@ -37,11 +37,11 @@ int main(void)
     pui32DataTx[2] = 77;
     pui32DataTx[3] = 66;
 
-    /*Write To Eep*/
-    Eep_Write(0x01,pui32DataTx, 3);
+    /*Write To Ea*/
+    Ea_Write(Block_ID_1, pui32DataTx);
 
     /*Read From Eep*/
-    Eep_Read(0x01,pui32DataRx , 3);
+    Ea_Read(Block_ID_1,Offset_Zero,pui32DataRx,One_Byte);
 
     while(1)
     {
