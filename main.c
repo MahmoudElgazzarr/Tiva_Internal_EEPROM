@@ -7,10 +7,20 @@
 #include "Ea_Cfg.h"
 #include "Ea.h"
 
+typedef struct Sensor
+{
+    uint32_t timestamp;
+    uint16_t reading;
+    uint8_t status;
+}Sensor_T;
 
-uint8_t pui32DataTx[4];
-uint8_t pui32DataRx[4];
-
+typedef struct Error
+{
+    uint32_t timestamp;
+    uint8_t code;
+    uint8_t sensor;
+    uint8_t reading;
+}Error_T;
 
 int main(void)
 {
@@ -25,25 +35,41 @@ int main(void)
     /*Initalize Ea*/
     Ea_Init();
 
-    /*Inialize Receive Buffer*/
-    pui32DataRx[0] = 0;
-    pui32DataRx[1] = 0;
-    pui32DataRx[2] = 0;
-    pui32DataRx[3] = 0;
+    /*Create 3 Sensor Elements*/
+    Sensor_T Sensor1,Sensor2,Sensor3;
+    /*Create 3 Error Elements*/
+    Error_T Error1,Error2,Error3;
 
-    /*Put Data To Send*/
-    pui32DataTx[0] = 99;
-    pui32DataTx[1] = 88;
-    pui32DataTx[2] = 77;
-    pui32DataTx[3] = 66;
+    /*Intalize Structure To Read*/
+    Sensor_T Sensor1_R;
 
-    /*Write To Ea*/
-    Ea_Write(Block_ID_1, pui32DataTx);
+    /*Init Sensor1 Data*/
+    Sensor1.reading = 99;
+    Sensor1.status = 88;
+    Sensor1.timestamp = 77;
 
-    /*Read From Eep*/
-    Ea_Read(Block_ID_1,Offset_Zero,pui32DataRx,One_Byte);
+    /*Init Sensor 2 Data*/
+    Sensor2.reading = 99;
+    Sensor2.status = 88;
+    Sensor2.timestamp =77;
 
-    while(1)
+    /*Write To Ea First Sensor Data*/
+    Ea_Write(Block_ID_1,(uint8_t *)&Sensor2);
+    /*Write To Ea Second Sensor Data*/
+    Ea_Write(Block_ID_2,(uint8_t *)&Sensor2);
+    /*Write To Ea Third Sensor Data*/
+    Ea_Write(Block_ID_3,(uint8_t *)&Sensor3);
+
+    /*Read From Ea Sensor 1*/
+    Ea_Read(Block_ID_1, Offset_Zero,(uint8_t *)&Sensor1_R, Eight_Bytes);
+
+    /*Read From Ea Sensor 2*/
+    Ea_Read(Block_ID_2, Offset_Zero,(uint8_t *)&Sensor2, Eight_Bytes);
+
+    /*Read From Ea Sensor 3*/
+    Ea_Read(Block_ID_3, Offset_Zero,(uint8_t *)&Sensor3, Eight_Bytes);
+
+    while (1)
     {
 
     }

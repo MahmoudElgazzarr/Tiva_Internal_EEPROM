@@ -26,6 +26,9 @@ enum Length_In_Bytes
     Three_Bytes,
     Four_Bytes,
     Five_Bytes,
+    Six_Bytes,
+    Seven_Bytes,
+    Eight_Bytes,
 };
 enum Block_IDs
 {
@@ -33,6 +36,7 @@ enum Block_IDs
     Block_ID_2,
     Block_ID_3,
     Block_ID_4,
+    Block_ID_5,
 };
 
 enum Offset
